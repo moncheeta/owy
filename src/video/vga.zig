@@ -1,5 +1,3 @@
-const std = @import("std");
-
 pub const WIDTH = 80;
 pub const HEIGHT = 25;
 pub const SIZE = WIDTH * HEIGHT;
@@ -27,11 +25,11 @@ pub const Cell = packed struct {
     character: u8,
     foreground: Color,
     background: Color,
-};
 
-pub fn createCell(character: u8, foreground: Color, background: Color) Cell {
-    return Cell{ .character = character, .foreground = foreground, .background = background };
-}
+    pub fn create(character: u8, foreground: Color, background: Color) Cell {
+        return Cell{ .character = character, .foreground = foreground, .background = background };
+    }
+};
 
 var buffer = @intToPtr([*]volatile Cell, 0xb8000);
 
@@ -41,9 +39,9 @@ pub fn putCellAt(cell: Cell, column: usize, row: usize) void {
 }
 
 pub fn clear() void {
-    const BLANK = createCell(' ', Color.White, Color.Black);
+    const EMPTY = Cell.create(' ', Color.White, Color.Black);
     var index: usize = 0;
     while (index < SIZE) : (index += 1) {
-        buffer[index] = BLANK;
+        buffer[index] = EMPTY;
     }
 }
