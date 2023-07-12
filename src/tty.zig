@@ -1,11 +1,12 @@
 const std = @import("std");
+const text = @import("video/text.zig");
 const vga = @import("video/vga.zig");
 
 var column: usize = 0;
 var row: usize = 0;
 
-var foreground: vga.Color = vga.Color.White;
-var background: vga.Color = vga.Color.Black;
+var foreground: text.Color = text.Color.White;
+var background: text.Color = text.Color.Black;
 
 fn nextColumn() void {
     if (column > vga.WIDTH) {
@@ -35,7 +36,7 @@ fn putChar(character: u8) void {
         nextRow();
         return;
     }
-    const cell = vga.Cell.create(character, foreground, background);
+    const cell = text.Cell.create(character, foreground, background);
     vga.putCellAt(cell, column, row);
     nextColumn();
 }
@@ -49,10 +50,12 @@ fn putStr(string: []const u8) void {
 pub const writer = std.io.Writer(void, error{}, callback){ .context = {} };
 fn callback(_: void, string: []const u8) error{}!usize {
     putStr(string);
+    vga.moveCursor(column, row);
     return string.len;
 }
 
 pub fn init() void {
-    vga.clear();
+    vga.clear(background);
     vga.disableCursor();
+    vga.enableCursor();
 }
